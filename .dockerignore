@@ -1,0 +1,16 @@
+.venv
+venv
+__pycache__
+*.pyc
+.env
+.git
+.gitlab
+.vscode
+.pytest_cache
+.mypy_cache
+.ruff_cache
+*.log
+bot
+mini-app
+mini-app/node_modules
+mini-app/dist

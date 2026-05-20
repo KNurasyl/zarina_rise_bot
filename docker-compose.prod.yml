@@ -1,0 +1,67 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: zarina-rise-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+
+  bot:
+    image: zarina-rise-bot:build
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: zarina-rise-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    command: python -m app.bot
+
+  api:
+    image: zarina-rise-api:build
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: zarina-rise-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    expose:
+      - "8000"
+
+  mini-app:
+    image: zarina-rise-mini-app:build
+    build:
+      context: ./mini-app
+      dockerfile: Dockerfile
+    container_name: zarina-rise-mini-app
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  nginx:
+    image: zarina-rise-nginx:build
+    build:
+      context: ./deploy/nginx
+      dockerfile: Dockerfile
+    container_name: zarina-rise-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    depends_on:
+      - api
+      - mini-app
+
+volumes:
+  mongo_data:

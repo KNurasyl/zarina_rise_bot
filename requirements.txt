@@ -1,0 +1,7 @@
+pymongo
+python-dotenv
+aiogram
+apscheduler
+fastapi
+uvicorn[standard]
+pydantic
